@@ -4,41 +4,42 @@ A Domain-Specific Language (DSL) for financial market analysis, supporting stock
 
 ## Project Structure
 
+```
 finance-terminal/
 ├─ README.md
 ├─ .env.example
 ├─ requirements.txt
 ├─ docs/
 │  ├─ grammar.bnf
-│  └─ examples.txt
-	└─ finance_terminal/
-		├─ __init__.py
-		├─ cli/
-		│  ├─ __init__.py
-		│  ├─ main.py
-		│  └─ bot.py
-		├─ dsl/
-		│  ├─ lexer.py
-		│  ├─ parser.py
-		│  ├─ symbol_table.py
-		│  ├─ semantic_analyzer.py
-		│  └─ interpreter.py
-		├─ data/
-		│  ├─ __init__.py
-		│  ├─ market_data.py
-		│  ├─ fundamentals_data.py
-		│  └─ sentiment_data.py
-		├─ models/
-		│  ├─ __init__.py
-		│  ├─ stocks.py
-		│  ├─ options.py
-		│  ├─ futures.py
-		│  └─ bonds.py
-		└─ utils/
-			├─ __init__.py
-			├─ ai_helper.py
-			├─ formatting.py
-			└─ math_helpers.py
+│  └─ examples.md
+└─ src/
+    ├─ __init__.py
+    ├─ cli/
+    │  ├─ __init__.py
+    │  └─ main.py
+    ├─ dsl/
+    │  ├─ lexer.py
+    │  ├─ parser.py
+    │  ├─ symbol_table.py
+    │  ├─ semantic_analyzer.py
+    │  └─ interpreter.py
+    ├─ data/
+    │  ├─ __init__.py
+    │  ├─ market_data.py
+    │  ├─ fundamentals_data.py
+    │  └─ sentiment_data.py
+    ├─ models/
+    │  ├─ __init__.py
+    │  ├─ stocks.py
+    │  ├─ options.py
+    │  ├─ futures.py
+    │  └─ bonds.py
+    └─ utils/
+        ├─ __init__.py
+        ├─ ai_helper.py
+        ├─ formatting.py
+        └─ math_helpers.py
+```
 
 ## Setup
 
@@ -55,7 +56,7 @@ cp .env.example .env
 
 ```bash
 # Interactive CLI
-python -m src.finance_terminal.cli.main
+python -m src.cli.main
 ```
 
 Enter DSL commands like:
@@ -70,41 +71,41 @@ See docs/grammar.bnf
 
 ## Examples
 
-See docs/examples.txt
+See docs/examples.md
 
 ## TODO Checklist (DSL Project Tasks)
 
 ### 1) DSL Core Components (`dsl/`)
 
-- [X] Define BNF grammar (docs/grammar.bnf)
-- [X] Implement Lexer with tokenization (keywords, identifiers, periods, strings)
-- [X] Implement Parser with AST nodes (AnalyzeStmt, CalculateStmt, ShowStmt)
-- [X] Implement Symbol Table for variable storage
-- [X] Implement Semantic Analyzer for validation (asset types, periods, errors)
-- [X] Implement Interpreter with visitor pattern for execution
-- [X] Integrate data fetching in interpreter (stock prices/volatility)
+- [x] Define BNF grammar (docs/grammar.bnf)
+- [x] Implement Lexer with tokenization (keywords, identifiers, periods, strings)
+- [x] Implement Parser with AST nodes (AnalyzeStmt, CalculateStmt, ShowStmt)
+- [x] Implement Symbol Table for variable storage
+- [x] Implement Semantic Analyzer for validation (asset types, periods, errors)
+- [x] Implement Interpreter with visitor pattern for execution
+- [x] Integrate data fetching in interpreter (stock prices/volatility)
 
 ### 2) CLI Interface (`cli/`)
 
-- [X] Build interactive CLI loop
-- [X] Add command-line argument support
-- [X] Add debug prints for AST and symbol table
-- [X] Error handling for invalid commands
+- [x] Build interactive CLI loop
+- [x] Add command-line argument support
+- [x] Add debug prints for AST and symbol table
+- [x] Error handling for invalid commands
 - [ ] Implement Telegram bot for DSL command execution
 - [ ] Add document retrieval and sharing via Telegram bot
 - [ ] Integrate bot with DSL interpreter for real-time responses
 
 ### 3) Data Integration (`data/`)
 
-- [X] Stock market data fetching (yfinance)
-- [X] Fundamentals data (placeholders for statements)
-- [X] Sentiment data (Fear & Greed index)
-- [X] Error handling for API failures
+- [x] Stock market data fetching (yfinance)
+- [x] Fundamentals data (placeholders for statements)
+- [x] Sentiment data (Fear & Greed index)
+- [x] Error handling for API failures
 
 ### 4) Model Skeletons (`models/`)
 
-- [X] Stock class skeleton
-- [X] Option/Futures/Bond class skeletons
+- [x] Stock class skeleton
+- [x] Option/Futures/Bond class skeletons
 - [ ] Implement full Stock model (DCF, ratios)
 - [ ] Implement Option model (Black-Scholes)
 - [ ] Implement Futures model (cost-of-carry)
@@ -112,12 +113,12 @@ See docs/examples.txt
 
 ### 5) Utils and Testing
 
-- [X] Project structure with modular folders (cli, dsl, data, models, utils)
-- [X] Dependencies setup (requirements.txt, .env.example)
-- [X] AI helper skeleton
-- [X] Formatting/validation/math helpers
-- [X] Unit tests for data fetching
-- [X] Documentation (README, examples.md)
+- [x] Project structure with modular folders (cli, dsl, data, models, utils)
+- [x] Dependencies setup (requirements.txt, .env.example)
+- [x] AI helper skeleton
+- [x] Formatting/validation/math helpers
+- [x] Unit tests for data fetching
+- [x] Documentation (README, examples.md)
 
 ### 6) Advanced DSL Features (Future)
 

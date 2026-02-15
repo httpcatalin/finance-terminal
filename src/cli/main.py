@@ -2,11 +2,11 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from finance_terminal.dsl.lexer import Lexer
-from finance_terminal.dsl.parser import Parser
-from finance_terminal.dsl.symbol_table import SymbolTable
-from finance_terminal.dsl.semantic_analyzer import SemanticAnalyzer
-from finance_terminal.dsl.interpreter import Interpreter
+from src.dsl.lexer import Lexer
+from src.dsl.parser import Parser
+from src.dsl.symbol_table import SymbolTable
+from src.dsl.semantic_analyzer import SemanticAnalyzer
+from src.dsl.interpreter import Interpreter
 
 def main():
     if len(sys.argv) > 1:
