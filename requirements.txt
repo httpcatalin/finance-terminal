@@ -6,3 +6,5 @@ matplotlib
 requests
 openai
 plotext
+python-dotenv
+fredapi

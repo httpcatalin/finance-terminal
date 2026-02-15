@@ -1,0 +1,33 @@
+# Financial Terminal DSL Grammar (BNF)
+
+<program> ::= <statement> | <statement> <program>
+
+<statement> ::= <analyze_stmt> | <calculate_stmt> | <show_stmt>
+
+<analyze_stmt> ::= "analyze" <asset_type> <ticker> "for" <period>
+
+<calculate_stmt> ::= "calculate" <calc_type> "for" <ticker> <params>
+
+<show_stmt> ::= "show" <show_type> "for" <ticker>
+
+<asset_type> ::= "stock" | "option" | "future" | "bond"
+
+<ticker> ::= [A-Z]+
+
+<period> ::= "1M" | "6M" | "1Y" | "5Y"
+
+<calc_type> ::= "dcf" | "black_scholes" | "futures_price" | "bond_price"
+
+<params> ::= <param> | <param> <params>
+
+<param> ::= <key> <value>
+
+<key> ::= "growth" | "discount" | "years" | "strike" | "volatility" | "maturity" | "underlying" | "cost_of_carry" | "expiry" | "face_value" | "coupon" | "ytm"
+
+<value> ::= <number> | <string>
+
+<number> ::= [0-9]+ ( "." [0-9]+ )?
+
+<string> ::= [a-zA-Z0-9]+
+
+<show_type> ::= "income_statement" | "balance_sheet" | "cash_flow" | "prices" | "volatility"

@@ -1,18 +1,28 @@
-# Finance Terminal
+# Finance Terminal DSL
 
-PBL project that allows users should be able to analyze **Stocks, Options, Futures, and Bonds** from the command line, then ask an AI helper to explain results in plain English.
+A Domain-Specific Language (DSL) for financial market analysis, supporting stocks, options, futures, and bonds. Built for university ELSD & LFA course.
 
-## Current Project Structure
+## Project Structure
 
-```text
 finance-terminal/
 ├─ README.md
-└─ src/
+├─ .env.example
+├─ requirements.txt
+├─ docs/
+│  ├─ grammar.bnf
+│  └─ examples.txt
 	└─ finance_terminal/
 		├─ __init__.py
 		├─ cli/
 		│  ├─ __init__.py
-		│  └─ main.py
+		│  ├─ main.py
+		│  └─ bot.py
+		├─ dsl/
+		│  ├─ lexer.py
+		│  ├─ parser.py
+		│  ├─ symbol_table.py
+		│  ├─ semantic_analyzer.py
+		│  └─ interpreter.py
 		├─ data/
 		│  ├─ __init__.py
 		│  ├─ market_data.py
@@ -28,9 +38,7 @@ finance-terminal/
 			├─ __init__.py
 			├─ ai_helper.py
 			├─ formatting.py
-			├─ validation.py
 			└─ math_helpers.py
-```
 
 ## Setup
 
@@ -38,87 +46,97 @@ finance-terminal/
 python -m venv .venv
 .venv\Scripts\activate
 pip install -U pip
-```
-
-When dependencies are finalized, install them with:
-
-```bash
 pip install -r requirements.txt
+cp .env.example .env
+# Edit .env with your API keys (or request from me)
 ```
 
 ## Run
 
 ```bash
+# Interactive CLI
 python -m src.finance_terminal.cli.main
 ```
 
-## TODO Checklist (ne impartim aici cu takurile)
+Enter DSL commands like:
 
-### 2) Data Layer (`data/`)
+- analyze stock AAPL for 1Y
+- calculate dcf for AAPL growth 0.05 discount 0.1 years 5
+- show income_statement for AAPL
 
-- [ ] Create/centralize `data_api.py` style orchestration (or keep split files + one aggregator)
-- [ ] Fetch stock historical prices using `yfinance`
-- [ ] Fetch stock financial statements (income, balance sheet, cash flow)
-- [ ] Calculate historical volatility for options
-- [ ] Fetch risk-free rates (Treasury yields via FRED API)
-- [ ] Fetch futures prices (commodities/indices)
-- [ ] Fetch bond yields
-- [ ] Fetch Fear & Greed index (CNN API)
-- [ ] Add error handling/retries for API failures
+## DSL Grammar
 
-### 3) Stocks Module (`models/stocks.py`)
+See docs/grammar.bnf
 
-- [ ] Add price performance for 1M, 6M, 1Y, 5Y
-- [ ] Show financial statements (income, balance sheet, cash flow)
-- [ ] Implement DCF model with user inputs: growth %, discount rate, forecast years
-- [ ] Compute discounted cash flows + intrinsic value output
-- [ ] (Optional) Add ratios: P/E, P/B, ROE, Debt/Equity
-- [ ] (Optional) Add ASCII chart for price trends
+## Examples
 
-### 4) Options Module (`models/options.py`)
+See docs/examples.txt
 
-- [ ] Implement Black-Scholes pricing (call + put)
-- [ ] Accept strike, stock price, volatility, time to maturity inputs
-- [ ] Adjust option pricing context using Fear & Greed index
-- [ ] (Optional) Add Greeks: Delta, Gamma, Theta, Vega
-- [ ] (Optional) Add Monte Carlo option pricing simulation
+## TODO Checklist (DSL Project Tasks)
 
-### 5) Futures Module (`models/futures.py`)
+### 1) DSL Core Components (`dsl/`)
 
-- [ ] Implement cost-of-carry futures pricing model
-- [ ] Build PnL simulator (entry price vs current price)
-- [ ] (Optional) Add contango/backwardation indicator
-- [ ] (Optional) Add simple commodity futures dashboard in terminal
+- [X] Define BNF grammar (docs/grammar.bnf)
+- [X] Implement Lexer with tokenization (keywords, identifiers, periods, strings)
+- [X] Implement Parser with AST nodes (AnalyzeStmt, CalculateStmt, ShowStmt)
+- [X] Implement Symbol Table for variable storage
+- [X] Implement Semantic Analyzer for validation (asset types, periods, errors)
+- [X] Implement Interpreter with visitor pattern for execution
+- [X] Integrate data fetching in interpreter (stock prices/volatility)
 
-### 6) Bonds Module (`models/bonds.py`)
+### 2) CLI Interface (`cli/`)
 
-- [ ] Implement bond pricing formula (face value, coupon, years, YTM)
-- [ ] Calculate Yield to Maturity
-- [ ] Calculate Duration and Convexity
-- [ ] (Optional) Plot/print yield curve view
-- [ ] (Optional) Show interest-rate sensitivity output
+- [X] Build interactive CLI loop
+- [X] Add command-line argument support
+- [X] Add debug prints for AST and symbol table
+- [X] Error handling for invalid commands
+- [ ] Implement Telegram bot for DSL command execution
+- [ ] Add document retrieval and sharing via Telegram bot
+- [ ] Integrate bot with DSL interpreter for real-time responses
 
-### 7) AI Helper (`utils/ai_helper.py`)
+### 3) Data Integration (`data/`)
 
-- [ ] Add function to send prompt + receive response from OpenAI API
-- [ ] Add DCF explanation prompt template
-- [ ] Add options-price explanation template
-- [ ] Add futures-market explanation template
-- [ ] Add bond-risk explanation template
-- [ ] (Optional) Generate full AI Risk Report per asset
+- [X] Stock market data fetching (yfinance)
+- [X] Fundamentals data (placeholders for statements)
+- [X] Sentiment data (Fear & Greed index)
+- [X] Error handling for API failures
 
-### 8) CLI Interface (`cli/main.py`)
+### 4) Model Skeletons (`models/`)
 
-- [ ] Build main menu: Stocks / Options / Futures / Bonds / Exit
-- [ ] Add submenus with input prompts and result display
-- [ ] Add AI explanation option for each analysis flow
-- [ ] (Optional) Allow saving report output to `.txt`
+- [X] Stock class skeleton
+- [X] Option/Futures/Bond class skeletons
+- [ ] Implement full Stock model (DCF, ratios)
+- [ ] Implement Option model (Black-Scholes)
+- [ ] Implement Futures model (cost-of-carry)
+- [ ] Implement Bond model (pricing)
 
-### 9) Extras / Advanced (Optional, unlikely lol)
+### 5) Utils and Testing
 
-- [ ] Stock technical indicators (RSI, MACD, moving averages)
-- [ ] Portfolio tracker (multiple assets)
-- [ ] Portfolio risk metrics (volatility, Sharpe ratio, sector allocation)
-- [ ] News sentiment analysis for stocks/futures using AI
-- [ ] More ASCII terminal charts
-- [ ] Interactive AI chat mode: “Ask AI about this stock”
+- [X] Project structure with modular folders (cli, dsl, data, models, utils)
+- [X] Dependencies setup (requirements.txt, .env.example)
+- [X] AI helper skeleton
+- [X] Formatting/validation/math helpers
+- [X] Unit tests for data fetching
+- [X] Documentation (README, examples.md)
+
+### 6) Advanced DSL Features (Future)
+
+- [ ] Support for multiple statements per command
+- [ ] Variable declarations and symbol table usage
+- [ ] String literals in commands
+- [ ] Error recovery in parsing
+- [ ] Performance optimizations
+- [ ] AI integration for command explanations (e.g., explain DCF results)
+- [ ] AI-powered risk reports per analysis
+- [ ] Interactive AI chat mode for financial queries
+- [ ] Sentiment analysis with AI for market context
+- [ ] Export results to PDF/CSV via commands
+- [ ] Multi-language support for DSL keywords
+- [ ] Historical data caching for faster queries
+- [ ] Real-time data streaming for live analysis
+
+### 7) Bot and External Integrations
+
+- [ ] Telegram bot setup with DSL command handling
+- [ ] Document upload/download via bot (e.g., share reports)
+- [ ] Webhook integration for automated DSL execution

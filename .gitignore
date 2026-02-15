@@ -124,5 +124,4 @@ Thumbs.db
 # Finance-specific
 *.csv
 *.xlsx
-data/
 logs/
