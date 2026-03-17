@@ -10,6 +10,7 @@ def get_fear_greed_index():
         response = requests.get(url)
         response.raise_for_status()
         data = response.json()
+        print(f"Received data: {json.dumps(data, indent=2)}")
         index = int(data['data'][0]['value'])
         return index
     except Exception as e:

@@ -1,33 +1,115 @@
-# Financial Terminal DSL Grammar (BNF)
+# Financial Terminal DSL Grammar (BNF) - Complex Version
 
-<program> ::= <statement> | <statement> <program>
+<program> ::= <statement_list>
 
-<statement> ::= <analyze_stmt> | <calculate_stmt> | <show_stmt>
+<statement_list> ::= <statement> | <statement> <statement_list>
 
-<analyze_stmt> ::= "analyze" <asset_type> <ticker> "for" <period>
+<statement> ::= <declaration_stmt> | <assignment_stmt> | <analyze_stmt> | <calculate_stmt> | <show_stmt> | <if_stmt> | <while_stmt> | <for_stmt> | <function_def> | <return_stmt> | <expression_stmt> | <block_stmt>
 
-<calculate_stmt> ::= "calculate" <calc_type> "for" <ticker> <params>
+<block_stmt> ::= "{" <statement_list> "}"
 
-<show_stmt> ::= "show" <show_type> "for" <ticker>
+<declaration_stmt> ::= <type> <identifier> | <type> <identifier> "=" <expression>
 
-<asset_type> ::= "stock" | "option" | "future" | "bond"
+<type> ::= "int" | "float" | "string" | "bool" | "date" | "currency" | "stock" | "option" | "future" | "bond" | "array" "[" <type> "]" | "dict" "[" <type> "," <type> "]"
 
-<ticker> ::= [A-Z]+
+<assignment_stmt> ::= <identifier> "=" <expression> | <identifier> "[" <expression> "]" "=" <expression> | <identifier> "." <identifier> "=" <expression>
 
-<period> ::= "1M" | "6M" | "1Y" | "5Y"
+<analyze_stmt> ::= "analyze" <asset_type> <ticker> "for" <period> <analyze_options>
 
-<calc_type> ::= "dcf" | "black_scholes" | "futures_price" | "bond_price"
+<analyze_options> ::= <analyze_option> | <analyze_option> <analyze_options> | ε
 
-<params> ::= <param> | <param> <params>
+<analyze_option> ::= "with" <identifier> | "filter" <expression> | "group" "by" <identifier>
 
-<param> ::= <key> <value>
+<calculate_stmt> ::= "calculate" <calc_type> "for" <ticker> <params> <calc_options>
 
-<key> ::= "growth" | "discount" | "years" | "strike" | "volatility" | "maturity" | "underlying" | "cost_of_carry" | "expiry" | "face_value" | "coupon" | "ytm"
+<calc_options> ::= <calc_option> | <calc_option> <calc_options> | ε
 
-<value> ::= <number> | <string>
+<calc_option> ::= "using" <identifier> | "method" <string> | "iterations" <number>
 
-<number> ::= [0-9]+ ( "." [0-9]+ )?
+<show_stmt> ::= "show" <show_type> "for" <ticker> <show_filters> <show_format>
 
-<string> ::= [a-zA-Z0-9]+
+<show_filters> ::= "where" <expression> | ε
 
-<show_type> ::= "income_statement" | "balance_sheet" | "cash_flow" | "prices" | "volatility"
+<show_format> ::= "as" <format_type> | ε
+
+<format_type> ::= "table" | "chart" | "json" | "csv"
+
+<if_stmt> ::= "if" "(" <expression> ")" <statement> | "if" "(" <expression> ")" <statement> "else" <statement>
+
+<while_stmt> ::= "while" "(" <expression> ")" <statement>
+
+<for_stmt> ::= "for" "(" <identifier> "in" <expression> ")" <statement>
+
+<function_def> ::= "def" <identifier> "(" <param_list> ")" <statement>
+
+<param_list> ::= <param> | <param> "," <param_list> | ε
+
+<param> ::= <type> <identifier>
+
+<return_stmt> ::= "return" <expression> | "return"
+
+<expression_stmt> ::= <expression> ";"
+
+<expression> ::= <logical_or_expr>
+
+<logical_or_expr> ::= <logical_and_expr> | <logical_or_expr> "||" <logical_and_expr>
+
+<logical_and_expr> ::= <equality_expr> | <logical_and_expr> "&&" <equality_expr>
+
+<equality_expr> ::= <comparison_expr> | <equality_expr> "==" <comparison_expr> | <equality_expr> "!=" <comparison_expr>
+
+<comparison_expr> ::= <additive_expr> | <comparison_expr> "<" <additive_expr> | <comparison_expr> ">" <additive_expr> | <comparison_expr> "<=" <additive_expr> | <comparison_expr> ">=" <additive_expr>
+
+<additive_expr> ::= <multiplicative_expr> | <additive_expr> "+" <multiplicative_expr> | <additive_expr> "-" <multiplicative_expr>
+
+<multiplicative_expr> ::= <unary_expr> | <multiplicative_expr> "*" <unary_expr> | <multiplicative_expr> "/" <unary_expr> | <multiplicative_expr> "%" <unary_expr>
+
+<unary_expr> ::= <power_expr> | "!" <unary_expr> | "-" <unary_expr> | "+" <unary_expr>
+
+<power_expr> ::= <primary_expr> | <power_expr> "^" <unary_expr>
+
+<primary_expr> ::= <literal> | <identifier> | "(" <expression> ")" | <function_call> | <array_literal> | <dict_literal> | <member_access> | <array_access>
+
+<function_call> ::= <identifier> "(" <arg_list> ")"
+
+<arg_list> ::= <expression> | <expression> "," <arg_list> | ε
+
+<array_literal> ::= "[" <arg_list> "]"
+
+<dict_literal> ::= "{" <key_value_list> "}"
+
+<key_value_list> ::= <expression> ":" <expression> | <expression> ":" <expression> "," <key_value_list> | ε
+
+<member_access> ::= <primary_expr> "." <identifier>
+
+<array_access> ::= <primary_expr> "[" <expression> "]"
+
+<literal> ::= <number> | <string> | <bool_literal> | <date_literal> | <currency_literal>
+
+<bool_literal> ::= "true" | "false"
+
+<date_literal> ::= "date" "(" <string> ")"
+
+<currency_literal> ::= "currency" "(" <number> "," <string> ")"
+
+<asset_type> ::= "stock" | "option" | "future" | "bond" | "portfolio"
+
+<ticker> ::= <identifier>
+
+<period> ::= <string> | <number> <time_unit>
+
+<time_unit> ::= "days" | "weeks" | "months" | "years"
+
+<calc_type> ::= "dcf" | "black_scholes" | "futures_price" | "bond_price" | "volatility" | "sharpe_ratio" | "var" | "correlation" | "beta" | "monte_carlo"
+
+<params> ::= <param> | <param> <params> | ε
+
+<param> ::= <identifier> <expression>
+
+<show_type> ::= "income_statement" | "balance_sheet" | "cash_flow" | "prices" | "volatility" | "ratios" | "chart" | "statistics" | "correlation_matrix" | "portfolio_performance"
+
+<identifier> ::= [a-zA-Z_][a-zA-Z0-9_]*
+
+<number> ::= [0-9]+ ("." [0-9]+)? (("e"|"E") ("+"|"-")? [0-9]+)?
+
+<string> ::= "\"" ([^"\\] | "\\" .)* "\"" | "'" ([^'\\] | "\\" .)* "'"
