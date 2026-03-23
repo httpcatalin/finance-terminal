@@ -17,7 +17,8 @@ KEYWORDS = {
     'balance_sheet': 'BALANCE_SHEET',
     'cash_flow': 'CASH_FLOW',
     'prices': 'PRICES',
-    'volatility': 'VOLATILITY'
+    'volatility': 'VOLATILITY',
+    'moat': 'MOAT'
 }
 
 class Token:
@@ -63,6 +64,26 @@ class Lexer:
         while self.current_char is not None and (self.current_char.isdigit() or self.current_char in 'YM'):
             result += self.current_char
             self.advance()
+        return result
+
+    def read_number(self):
+        result = ''
+        dot_count = 0
+        while self.current_char is not None and (self.current_char.isdigit() or self.current_char == '.'):
+            if self.current_char == '.':
+                dot_count += 1
+                if dot_count > 1:
+                    break
+            result += self.current_char
+            self.advance()
+
+        # Support percent-style literals like 5% by normalizing to decimal.
+        if self.current_char == '%':
+            self.advance()
+            try:
+                return str(float(result) / 100.0)
+            except ValueError:
+                return result
         return result
 
     def tokenize(self):

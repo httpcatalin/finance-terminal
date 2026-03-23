@@ -22,7 +22,7 @@
 
 <param> ::= <key> <value>
 
-<key> ::= "growth" | "discount" | "years" | "strike" | "volatility" | "maturity" | "underlying" | "cost_of_carry" | "expiry" | "face_value" | "coupon" | "ytm"
+<key> ::= "growth" | "discount" | "beta" | "years" | "terminal_growth" | "strike" | "volatility" | "maturity" | "underlying" | "cost_of_carry" | "expiry" | "face_value" | "coupon" | "ytm"
 
 <value> ::= <number> | <string>
 
@@ -30,4 +30,12 @@
 
 <string> ::= [a-zA-Z0-9]+
 
-<show_type> ::= "income_statement" | "balance_sheet" | "cash_flow" | "prices" | "volatility"
+<show_type> ::= "income_statement" | "balance_sheet" | "cash_flow" | "prices" | "volatility" | "moat"
+
+Examples:
+	calculate dcf for AAPL growth 0.15 years 10
+	calculate dcf for GOOGL growth 0.10 beta 1.00 years 10
+	calculate dcf for GOOGL growth 0.10 discount 0.09 years 10
+	calculate dcf for META growth 0.12 years 10 terminal_growth 0.025
+	calculate dcf for MSFT growth 0.08 discount auto years 10 terminal_growth 0.03
+	show moat for GOOGL
