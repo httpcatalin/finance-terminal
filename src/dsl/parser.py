@@ -78,14 +78,21 @@ class Parser:
         calc_type = self.current_token.value
         self.advance()
         self.advance()
+
+        # Allow optional asset keyword in calculate syntax (e.g., "for stock META").
+        if self.current_token and self.current_token.type in ['STOCK', 'OPTION', 'FUTURE', 'BOND']:
+            self.advance()
+
         ticker = self.current_token.value
         self.advance()
         params = {}
         while self.current_token and self.current_token.type == 'IDENTIFIER':
             key = self.current_token.value
             self.advance()
-            value = self.current_token.value if self.current_token.type in ['NUMBER', 'STRING'] else None
-            self.advance()
+            value = None
+            if self.current_token and self.current_token.type in ['NUMBER', 'STRING', 'IDENTIFIER', 'PERIOD']:
+                value = self.current_token.value
+                self.advance()
             params[key] = value
         return CalculateStmt(calc_type, ticker, params)
 

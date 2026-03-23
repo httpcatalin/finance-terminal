@@ -52,6 +52,8 @@
 
 <analyze_option> ::= "with" <identifier> | "filter" <expression> | "group" "by" <identifier>
 
+<key> ::= "growth" | "discount" | "beta" | "years" | "terminal_growth" | "strike" | "volatility" | "maturity" | "underlying" | "cost_of_carry" | "expiry" | "face_value" | "coupon" | "ytm"
+
 <calculate_stmt> ::= "calculate" <calc_type> "for" <ticker> <params> <calc_options>
 
 <calc_options> ::= <calc_option> | <calc_option> <calc_options> | ε
@@ -151,7 +153,7 @@
 <currency_literal> ::= "currency" "(" <number> "," <string> ")"
 
 # ============================================================================
-# DOMAIN-SPECIFIC ELEMENTS  
+# DOMAIN-SPECIFIC ELEMENTS
 # ============================================================================
 
 <asset_type> ::= "stock" | "option" | "future" | "bond" | "portfolio"
@@ -169,7 +171,7 @@
 # Parameter binding in calculate statements: "param_name value"
 <param> ::= <identifier> <expression>
 
-<show_type> ::= "income_statement" | "balance_sheet" | "cash_flow" | "prices" | "volatility" | "ratios" | "chart" | "statistics" | "correlation_matrix" | "portfolio_performance"
+<show_type> ::= "income_statement" | "balance_sheet" | "cash_flow" | "prices" | "volatility" | "ratios" | "chart" | "statistics" | "correlation_matrix" | "portfolio_performance" | "moat"
 
 # ============================================================================
 # LEXICAL ELEMENTS (Terminals)
@@ -184,3 +186,11 @@
 # ============================================================================
 # END OF GRAMMAR - Version 2.0 (Week 6 Validated & Mentor Approved)
 # ============================================================================
+
+Examples:
+	calculate dcf for AAPL growth 0.15 years 10
+	calculate dcf for GOOGL growth 0.10 beta 1.00 years 10
+	calculate dcf for GOOGL growth 0.10 discount 0.09 years 10
+	calculate dcf for META growth 0.12 years 10 terminal_growth 0.025
+	calculate dcf for MSFT growth 0.08 discount auto years 10 terminal_growth 0.03
+	show moat for GOOGL

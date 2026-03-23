@@ -32,5 +32,5 @@ class SemanticAnalyzer:
             self.errors.append(f"Invalid calculation type: {node.calc_type}")
 
     def visit_show(self, node):
-        if node.show_type not in ['income_statement', 'balance_sheet', 'cash_flow', 'prices', 'volatility']:
+        if node.show_type not in ['income_statement', 'balance_sheet', 'cash_flow', 'prices', 'volatility', 'moat']:
             self.errors.append(f"Invalid show type: {node.show_type}")

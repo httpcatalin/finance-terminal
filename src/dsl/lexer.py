@@ -1,7 +1,5 @@
 import re
 
-import re
-
 KEYWORDS = {
     'analyze': 'ANALYZE',
     'calculate': 'CALCULATE',
@@ -31,6 +29,7 @@ KEYWORDS = {
     'statistics': 'STATISTICS',
     'correlation_matrix': 'CORRELATION_MATRIX',
     'portfolio_performance': 'PORTFOLIO_PERFORMANCE',
+    'moat': 'MOAT',
     'int': 'INT',
     'float': 'FLOAT',
     'string': 'STRING',
@@ -42,7 +41,6 @@ KEYWORDS = {
     'if': 'IF',
     'else': 'ELSE',
     'while': 'WHILE',
-    'for': 'FOR',
     'def': 'DEF',
     'return': 'RETURN',
     'true': 'TRUE',
@@ -54,7 +52,6 @@ KEYWORDS = {
     'where': 'WHERE',
     'as': 'AS',
     'table': 'TABLE',
-    'chart': 'CHART',
     'json': 'JSON',
     'csv': 'CSV',
     'using': 'USING',
@@ -114,9 +111,21 @@ class Lexer:
 
     def read_number(self):
         result = ''
+        dot_count = 0
         while self.current_char is not None and (self.current_char.isdigit() or self.current_char == '.'):
+            if self.current_char == '.':
+                dot_count += 1
+                if dot_count > 1:
+                    break
             result += self.current_char
             self.advance()
+
+        if self.current_char == '%':
+            self.advance()
+            try:
+                return str(float(result) / 100.0)
+            except ValueError:
+                return result
         return result
 
     def tokenize(self):
