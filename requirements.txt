@@ -8,3 +8,5 @@ openai
 plotext
 python-dotenv
 fredapi
+plotly
+statsmodels

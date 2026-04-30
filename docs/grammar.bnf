@@ -39,3 +39,47 @@ Examples:
 	calculate dcf for META growth 0.12 years 10 terminal_growth 0.025
 	calculate dcf for MSFT growth 0.08 discount auto years 10 terminal_growth 0.03
 	show moat for GOOGL
+
+# =========================================================================
+# Option Pricing Commands (POSIX-style)
+# =========================================================================
+#
+# Syntax:  COMMAND TICKER [KEY=VALUE ...] [--flag ...]
+#
+# Session: use SET TICKER to avoid repeating the ticker on every command.
+#
+# <option_command> ::= <cmd> <ticker>? <kwargs>* <flags>*
+# <cmd>     ::= "BSM" | "BIN" | "MC" | "GARCH" | "VOL" | "IV"
+#             | "STRAT" | "COMPARE" | "VAR" | "CHAIN" | "SET" | "HELP"
+# <ticker>  ::= [A-Z]{1,5}
+# <kwargs>  ::= <key> "=" <value>
+# <flags>   ::= "--" <word>
+# <key>     ::= "K" | "T" | "sigma" | "r" | "q" | "N" | "B" | "steps"
+#             | "K1" | "K2" | "K3" | "PRICE" | "conf" | "horizon"
+#             | "expiry" | "option_type" | "vs"
+# <value>   ::= <number> | <percent> | <string>
+# <percent> ::= <number> "%"
+#
+# Option Pricing Examples:
+#   SET GOOG
+#   BSM GOOG K=150 T=0.25 --graph
+#   BSM GOOG K=150 T=0.25 --graph --delta
+#   BIN GOOG K=150 T=0.25 --american
+#   BIN GOOG K=150 T=0.25 steps=500 --graph
+#   MC GOOG K=150 T=0.25 N=100000
+#   MC GOOG K=150 --asian
+#   MC GOOG K=150 --barrier B=130 --up-and-out
+#   MC GOOG --lookback
+#   GARCH GOOG --forecast --graph
+#   VOL GOOG --smile
+#   VOL GOOG --surface
+#   IV GOOG K=150 T=0.25 PRICE=8.50
+#   STRAT GOOG straddle K=150 --graph
+#   STRAT GOOG bull-spread K1=140 K2=160 --graph
+#   STRAT GOOG butterfly K1=140 K2=150 K3=160 --graph
+#   COMPARE GOOG K=150 T=0.25 --graph
+#   VAR GOOG --hist --graph
+#   VAR GOOG --mc conf=0.99 horizon=10
+#   CHAIN GOOG
+#   CHAIN GOOG expiry=2026-06-19
+#   HELP
