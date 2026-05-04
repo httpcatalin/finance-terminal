@@ -32,6 +32,27 @@
 
 <show_type> ::= "income_statement" | "balance_sheet" | "cash_flow" | "prices" | "volatility" | "moat"
 
+# =========================================================================
+# News & Sentiment Commands
+# =========================================================================
+
+<news_stmt>  ::= "news" <ticker> [ <date_range> ] [ "limit" <integer> ]
+
+<date_range> ::= "today"
+               | "yesterday"
+               | "last_week"
+               | "last_month"
+               | <YYYY-MM-DD>
+
+<YYYY-MM-DD> ::= [0-9]{4} "-" [0-9]{2} "-" [0-9]{2}
+
+Examples:
+	news GOOGL
+	news GOOGL today
+	news AAPL 2025-03-19
+	news META last_week
+	news TSLA today limit 20
+
 Examples:
 	calculate dcf for AAPL growth 0.15 years 10
 	calculate dcf for GOOGL growth 0.10 beta 1.00 years 10

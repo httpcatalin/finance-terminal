@@ -1,75 +1,193 @@
-# Financial Terminal DSL Examples
+# Financial Terminal — Command Reference
 
-This document lists all command types defined in the DSL grammar (`grammar.bnf`), with examples. It categorizes them by implementation status based on the current code.
+All commands available in the DSL and option-pricing shell, grouped by category.
+See `grammar.bnf` for the formal grammar.
 
-## Fully Supported Commands
+---
 
-### Analyze Stock
+## 1. Stock Analysis
 
-Fetches historical prices and calculates volatility from Yahoo Finance.
+Fetches historical prices and historical volatility from Yahoo Finance.
 
 - Syntax: `analyze stock <ticker> for <period>`
-- Periods: 1M, 6M, 1Y, 5Y
-- Examples:
-  - `analyze stock AAPL for 1Y` → Prices and volatility for Apple.
-  - `analyze stock GOOGL for 6M` → Google data for 6 months.
-  - `analyze stock TSLA for 1M` → Tesla for 1 month.
+- Periods: `1M` `6M` `1Y` `5Y`
 
-## Partially Supported Commands
+```
+analyze stock AAPL for 1Y
+analyze stock GOOGL for 6M
+analyze stock TSLA for 1M
+analyze stock MSFT for 5Y
+```
 
-These parse and validate correctly, but execution is incomplete (placeholders, partial data, or errors).
+---
 
-### Show Prices
+## 2. Financial Statements
 
-Fetches and displays the latest stock price.
+Fetch fundamental data from Yahoo Finance.
 
-- Syntax: `show prices for <ticker>`
-- Example: `show prices for AAPL` → Latest close price.
+- Syntax: `show <type> for <ticker>`
+- Types: `income_statement` `balance_sheet` `cash_flow` `prices`
 
-### Show Income Statement / Balance Sheet / Cash Flow
+```
+show prices for AAPL
+show income_statement for AAPL
+show balance_sheet for MSFT
+show cash_flow for GOOGL
+```
 
-Attempts to fetch financial statements, but may fail due to API limits or missing keys.
+---
 
-- Syntax: `show <show_type> for <ticker>`
-- Show Types: income_statement, balance_sheet, cash_flow
-- Examples:
-  - `show income_statement for AAPL` → May show data or "Failed to fetch".
-  - `show balance_sheet for AAPL` → Same.
+## 3. Stock Valuation (DCF)
 
-### Calculate DCF
+Discounted Cash Flow valuation. Uses live FCF data from Yahoo Finance.
+All parameters are optional; omitted ones are auto-calculated.
 
-Parses parameters and prints a placeholder (no real DCF calculation).
+- Syntax: `calculate dcf for <ticker> [growth <f>] [discount <f|auto>] [years <n>] [terminal_growth <f>] [beta <f>]`
 
-- Syntax: `calculate dcf for <ticker> <params>`
-- Params: growth (float), discount (float), years (int)
-- Example: `calculate dcf for AAPL growth 0.05 discount 0.1 years 5` → Placeholder output.
+```
+calculate dcf for AAPL growth 0.15 years 10
+calculate dcf for GOOGL growth 0.10 beta 1.00 years 10
+calculate dcf for GOOGL growth 0.10 discount 0.09 years 10
+calculate dcf for META growth 0.12 years 10 terminal_growth 0.025
+calculate dcf for MSFT growth 0.08 discount auto years 10 terminal_growth 0.03
+```
 
-## Not Supported Yet
+---
 
-These are defined in the grammar but not implemented in the interpreter. They parse without errors but do nothing or error on execution.
+## 4. Moat Analysis
 
-### Analyze Option / Future / Bond
+AI-powered economic moat detection — identifies competitive advantages.
 
-- Syntax: `analyze <asset_type> <ticker> for <period>`
-- Asset Types: option, future, bond
-- Examples:
-  - `analyze option AAPL for 1Y` → No execution.
-  - `analyze future GC=F for 6M` → No execution.
-  - `analyze bond US10Y for 1Y` → No execution.
+- Syntax: `show moat for <ticker>`
 
-### Calculate Black-Scholes / Futures Price / Bond Price
+```
+show moat for GOOGL
+show moat for AAPL
+show moat for MSFT
+```
 
-- Syntax: `calculate <calc_type> for <ticker> <params>`
-- Calc Types: black_scholes, futures_price, bond_price
-- Params vary (e.g., strike, volatility for black_scholes).
-- Examples:
-  - `calculate black_scholes for AAPL strike 150 volatility 0.2 maturity 1` → No execution.
-  - `calculate futures_price for GC=F` → No execution.
-  - `calculate bond_price for US10Y face_value 1000 coupon 0.03 ytm 0.035` → No execution.
+---
 
-### Show Volatility
+## 5. News & Sentiment
 
-Defined but not implemented (volatility is in analyze instead).
+Fetches recent news (yfinance + NewsAPI) and runs AI sentiment analysis
+(OpenAI GPT-4o-mini) to classify each article as BULLISH / BEARISH / NEUTRAL.
 
-- Syntax: `show volatility for <ticker>`
-- Example: `show volatility for AAPL` → No execution.
+- Syntax: `news <ticker> [<date_range>] [limit <n>]`
+- Date ranges: `today` `yesterday` `last_week` `last_month` `YYYY-MM-DD`
+- Default date range: `today`; default limit: `15`
+
+```
+news GOOGL
+news GOOGL today
+news GOOGL last_week
+news AAPL last_month
+news META yesterday
+news TSLA 2026-04-20
+news MSFT last_week limit 20
+```
+
+---
+
+## 6. Option Pricing
+
+POSIX-style commands. Use `SET <ticker>` to avoid repeating the ticker.
+
+### Session
+```
+SET GOOG
+```
+
+### Black-Scholes (BSM)
+```
+BSM GOOG K=150 T=0.25
+BSM GOOG K=150 T=0.25 --graph
+BSM GOOG K=150 T=0.25 --graph --delta
+```
+
+### Binomial Tree (BIN)
+```
+BIN GOOG K=150 T=0.25
+BIN GOOG K=150 T=0.25 --american
+BIN GOOG K=150 T=0.25 steps=500 --graph
+```
+
+### Monte Carlo (MC)
+```
+MC GOOG K=150 T=0.25 N=100000
+MC GOOG K=150 --asian
+MC GOOG K=150 --barrier B=130 --up-and-out
+MC GOOG --lookback
+```
+
+### GARCH Volatility
+```
+GARCH GOOG --forecast --graph
+```
+
+### Implied Volatility
+```
+VOL GOOG --smile
+VOL GOOG --surface
+IV GOOG K=150 T=0.25 PRICE=8.50
+```
+
+### Strategies
+```
+STRAT GOOG straddle K=150 --graph
+STRAT GOOG bull-spread K1=140 K2=160 --graph
+STRAT GOOG butterfly K1=140 K2=150 K3=160 --graph
+```
+
+### Model Comparison & VaR
+```
+COMPARE GOOG K=150 T=0.25 --graph
+VAR GOOG --hist --graph
+VAR GOOG --mc conf=0.99 horizon=10
+```
+
+### Options Chain
+```
+CHAIN GOOG
+CHAIN GOOG expiry=2026-06-19
+```
+
+### Price Forecasting (ARIMA)
+```
+ARIMA GOOG steps=30 --graph
+ARIMA GOOG --seasonal --graph
+ARIMA GOOG --vol --graph
+```
+
+---
+
+## 7. Misc
+
+```
+HELP      Show all available commands with syntax
+```
+
+---
+
+## Parameter Reference
+
+| Parameter       | Used in          | Description                              |
+|-----------------|------------------|------------------------------------------|
+| `growth`        | DCF              | FCF annual growth rate (e.g. `0.10`)     |
+| `discount`      | DCF              | Discount / WACC rate, or `auto`          |
+| `terminal_growth` | DCF            | Perpetuity growth rate (default `0.03`)  |
+| `beta`          | DCF              | Override market beta                     |
+| `years`         | DCF              | Forecast horizon in years                |
+| `K`             | Options          | Strike price                             |
+| `T`             | Options          | Time to expiry in years                  |
+| `sigma`         | Options          | Volatility override                      |
+| `r`             | Options          | Risk-free rate                           |
+| `N`             | MC               | Number of simulations                    |
+| `B`             | MC barrier       | Barrier level                            |
+| `steps`         | BIN              | Binomial tree steps                      |
+| `K1` `K2` `K3`  | Strategies       | Strike levels for spreads/butterflies    |
+| `conf`          | VaR              | Confidence level (e.g. `0.99`)           |
+| `horizon`       | VaR              | Horizon in days                          |
+| `expiry`        | CHAIN            | Option expiry date (`YYYY-MM-DD`)        |
+| `PRICE`         | IV               | Market option price for IV calculation   |
+| `limit`         | NEWS             | Max articles to fetch (default `15`)     |

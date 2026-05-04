@@ -638,29 +638,80 @@ def cmd_chain(ticker: str, params: dict, flags: set, session: Session, cache: Da
 
 @registry.register("HELP", aliases=["help", "?"], description="Show available commands")
 def cmd_help(ticker: str, params: dict, flags: set, session: Session, cache: DataCache):
-    print("\n  Available commands:\n")
-    print(f"  {'Command':<12} {'Aliases':<25} Description")
-    print(f"  {'-'*70}")
+    W = 70
+    print("\n" + "=" * W)
+    print("  FINANCIAL TERMINAL — COMMAND REFERENCE")
+    print("=" * W)
+
+    print(f"\n  {'Command':<12} {'Aliases':<25} Description")
+    print(f"  {'-'*W}")
     for spec in registry.all_commands():
         aliases = ", ".join(spec.aliases) if spec.aliases else ""
         print(f"  {spec.name:<12} {aliases:<25} {spec.description}")
-    print(f"""
-  Syntax: COMMAND TICKER [KEY=VALUE ...] [--flag ...]
 
-  Examples:
-    SET GOOG                          Set session ticker
-    BSM GOOG K=150 T=0.25 --graph    BSM pricing with Greek chart
-    BIN GOOG K=150 --american         American option via binomial tree
-    MC GOOG K=150 --asian             Asian option via Monte Carlo
-    GARCH GOOG --forecast --graph     GARCH vol with term structure
-    VOL GOOG --smile                  Implied vol smile from chain
-    VOL GOOG --surface                Full vol surface heatmap
-    IV GOOG K=150 T=0.25 PRICE=8.5   Implied vol from market price
-    STRAT GOOG straddle K=150 --graph Strategy payoff diagram
-    COMPARE GOOG K=150 T=0.25        Model comparison (BSM vs BIN vs MC)
-    VAR GOOG --hist --graph           Historical VaR with histogram
-    ARIMA GOOG steps=30 --graph       Price forecast (ARIMA)
-    ARIMA GOOG --seasonal --graph     Seasonal ARIMA forecast
-    ARIMA GOOG --vol --graph          Volatility forecast
-    CHAIN GOOG                        Live options chain
+    print(f"""
+{"─" * W}
+  OPTION PRICING  —  COMMAND TICKER [KEY=VALUE ...] [--flag ...]
+{"─" * W}
+  SET GOOG                              Set session ticker (skip ticker on next calls)
+
+  BSM  GOOG K=150 T=0.25               Black-Scholes pricing
+  BSM  GOOG K=150 T=0.25 --graph       + Greek charts
+  BIN  GOOG K=150 T=0.25 --american    Binomial tree (American)
+  BIN  GOOG K=150 T=0.25 steps=500     Custom steps
+  MC   GOOG K=150 T=0.25 N=100000      Monte Carlo European
+  MC   GOOG K=150 --asian              Asian option
+  MC   GOOG K=150 --barrier B=130      Barrier option (up-and-out)
+  MC   GOOG --lookback                 Lookback option
+
+  GARCH GOOG --forecast --graph        GARCH vol forecast
+  VOL   GOOG --smile                   Implied vol smile
+  VOL   GOOG --surface                 Full vol surface heatmap
+  IV    GOOG K=150 T=0.25 PRICE=8.5   Implied vol from market price
+
+  STRAT GOOG straddle K=150 --graph    Strategy payoff diagram
+  STRAT GOOG bull-spread K1=140 K2=160 Bull spread
+  STRAT GOOG butterfly K1=140 K2=150 K3=160
+
+  COMPARE GOOG K=150 T=0.25 --graph   BSM vs BIN vs MC comparison
+  VAR   GOOG --hist --graph            Historical VaR
+  VAR   GOOG --mc conf=0.99 horizon=10 Monte Carlo VaR
+  ARIMA GOOG steps=30 --graph          Price forecast (ARIMA)
+  CHAIN GOOG                           Live options chain
+  CHAIN GOOG expiry=2026-06-19         Chain filtered by expiry
+
+{"─" * W}
+  STOCK ANALYSIS  —  DSL syntax
+{"─" * W}
+  analyze stock AAPL for 1Y            Historical prices + volatility
+  analyze stock GOOGL for 6M           Periods: 1M  6M  1Y  5Y
+
+  show prices for AAPL                 Latest close price
+  show income_statement for AAPL       Income statement
+  show balance_sheet for MSFT          Balance sheet
+  show cash_flow for GOOGL             Cash flow statement
+
+{"─" * W}
+  STOCK VALUATION (DCF & MOAT)
+{"─" * W}
+  calculate dcf for AAPL growth 0.15 years 10
+  calculate dcf for GOOGL growth 0.10 discount 0.09 years 10
+  calculate dcf for META growth 0.12 years 10 terminal_growth 0.025
+  calculate dcf for MSFT growth 0.08 discount auto years 10 terminal_growth 0.03
+    Params: growth  discount (or auto)  years  terminal_growth  beta
+
+  show moat for GOOGL                  AI-powered moat / competitive advantage
+
+{"─" * W}
+  NEWS & SENTIMENT
+{"─" * W}
+  news GOOGL                           Today's news + BULLISH/BEARISH/NEUTRAL
+  news GOOGL last_week                 Last 7 days
+  news AAPL last_month                 Last 30 days
+  news META yesterday                  Yesterday only
+  news TSLA 2026-04-20                 Specific date (YYYY-MM-DD)
+  news MSFT last_week limit 20         Up to 20 articles
+    Date ranges: today  yesterday  last_week  last_month  YYYY-MM-DD
+{"=" * W}
 """)
+

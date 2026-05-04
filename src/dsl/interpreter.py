@@ -1,4 +1,6 @@
-from .parser import AnalyzeStmt, CalculateStmt, ShowStmt
+from .parser import AnalyzeStmt, CalculateStmt, ShowStmt, NewsStmt
+from ..data.news_data import get_news
+from ..models.sentiment import analyse_sentiment
 from ..data.market_data import get_stock_prices, get_historical_volatility
 from ..data.fundamentals_data import get_income_statement, get_balance_sheet, get_cash_flow
 from ..models.stocks import Stock
@@ -21,6 +23,8 @@ class Interpreter:
             self.execute_calculate(node)
         elif isinstance(node, ShowStmt):
             self.execute_show(node)
+        elif isinstance(node, NewsStmt):
+            self.execute_news(node)
 
     def execute_analyze(self, node):
         try:
@@ -150,3 +154,40 @@ class Interpreter:
                 explain_moat(node.ticker)
         except Exception as e:
             print(f"Error in show: {e}")
+
+    def execute_news(self, node) -> None:
+        """
+        Handler for:
+            news GOOGL
+            news GOOGL today
+            news AAPL 2025-03-19
+            news META last_week
+            news TSLA today limit 20
+        """
+        try:
+            ticker   = node.ticker.upper()
+            date_str = node.date_str or "today"
+            limit    = node.limit or 15
+
+            print(f"\n  Fetching news for {ticker} ({date_str}) …")
+
+            articles = get_news(ticker=ticker, date_str=date_str, limit=limit)
+
+            if not articles:
+                print(f"  No news found for {ticker} in the requested period.")
+                print(f"  Try a broader range: news {ticker} last_week")
+                return
+
+            print(f"  Found {len(articles)} articles. Analysing sentiment …")
+
+            analyse_sentiment(
+                ticker   = ticker,
+                articles = articles,
+                date_str = date_str,
+                verbose  = True,
+            )
+
+        except Exception as exc:
+            print(f"  Error in news: {exc}")
+            import traceback
+            traceback.print_exc()
