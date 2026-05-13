@@ -30,6 +30,8 @@ KEYWORDS = {
     'correlation_matrix': 'CORRELATION_MATRIX',
     'portfolio_performance': 'PORTFOLIO_PERFORMANCE',
     'moat': 'MOAT',
+    'news': 'NEWS',
+    'limit': 'LIMIT',
     'int': 'INT',
     'float': 'FLOAT',
     'string': 'STRING',
@@ -128,6 +130,25 @@ class Lexer:
                 return result
         return result
 
+    def _try_read_date(self):
+        """
+        If the next characters match YYYY-MM-DD, consume and return the string.
+        Otherwise return None and leave position unchanged.
+        """
+        saved_pos  = self.pos
+        saved_char = self.current_char
+        result = ''
+        # Read up to 10 chars without advancing permanently
+        lookahead = self.text[self.pos:self.pos + 10]
+        import re
+        if re.fullmatch(r'\d{4}-\d{2}-\d{2}', lookahead):
+            # Consume exactly 10 characters
+            for _ in range(10):
+                result += self.current_char
+                self.advance()
+            return result
+        return None
+
     def tokenize(self):
         tokens = []
         while self.current_char is not None:
@@ -140,7 +161,14 @@ class Lexer:
                 tokens.append(Token(token_type, identifier))
                 continue
             if self.current_char.isdigit():
-                tokens.append(Token('NUMBER', self.read_number()))
+                date_val = self._try_read_date()
+                if date_val is not None:
+                    tokens.append(Token('IDENTIFIER', date_val))
+                    continue
+                if self.peek() and self.peek() in 'YM':
+                    tokens.append(Token('PERIOD', self.read_period()))
+                else:
+                    tokens.append(Token('NUMBER', self.read_number()))
                 continue
             if self.current_char == '"':
                 self.advance()

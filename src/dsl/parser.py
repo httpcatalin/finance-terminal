@@ -29,6 +29,15 @@ class ShowStmt(ASTNode):
     def __repr__(self):
         return f"ShowStmt(show_type='{self.show_type}', ticker='{self.ticker}')"
 
+class NewsStmt(ASTNode):
+    def __init__(self, ticker, date_str="today", limit=15):
+        self.ticker   = ticker
+        self.date_str = date_str
+        self.limit    = limit
+
+    def __repr__(self):
+        return f"NewsStmt(ticker='{self.ticker}', date_str='{self.date_str}', limit={self.limit})"
+
 class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
@@ -53,13 +62,15 @@ class Parser:
         return statements
 
     def parse_statement(self):
-        if self.current_token and self.current_token.type in ['ANALYZE', 'CALCULATE', 'SHOW']:
+        if self.current_token and self.current_token.type in ['ANALYZE', 'CALCULATE', 'SHOW', 'NEWS']:
             if self.current_token.type == 'ANALYZE':
                 return self.parse_analyze()
             elif self.current_token.type == 'CALCULATE':
                 return self.parse_calculate()
             elif self.current_token.type == 'SHOW':
                 return self.parse_show()
+            elif self.current_token.type == 'NEWS':
+                return self.parse_news_stmt()
         return None
 
     def parse_analyze(self):
@@ -104,3 +115,41 @@ class Parser:
         ticker = self.current_token.value
         self.advance()
         return ShowStmt(show_type, ticker)
+
+    def parse_news_stmt(self):
+        """
+        news <TICKER> [<date_range>] [limit <int>]
+
+        <date_range> ::= "today" | "yesterday" | "last_week" | "last_month" | YYYY-MM-DD
+        """
+        self.advance()   # consume "news"
+        ticker = self.current_token.value.upper() if self.current_token else "UNKNOWN"
+        self.advance()
+
+        date_str = "today"
+        limit    = 15
+
+        DATE_KEYWORDS = {"today", "yesterday", "last_week", "last_month"}
+        if (self.current_token
+                and self.current_token.type in ("IDENTIFIER", "NEWS", "LIMIT")
+                and (self.current_token.value.lower() in DATE_KEYWORDS
+                     or self._looks_like_date(self.current_token.value))):
+            date_str = self.current_token.value.lower()
+            self.advance()
+
+        if (self.current_token
+                and self.current_token.type == "LIMIT"):
+            self.advance()
+            if self.current_token and self.current_token.type == "NUMBER":
+                try:
+                    limit = int(float(self.current_token.value))
+                except (ValueError, TypeError):
+                    limit = 15
+                self.advance()
+
+        return NewsStmt(ticker=ticker, date_str=date_str, limit=limit)
+
+    def _looks_like_date(self, value: str) -> bool:
+        """Return True if value matches YYYY-MM-DD."""
+        import re
+        return bool(re.fullmatch(r'\d{4}-\d{2}-\d{2}', value))
